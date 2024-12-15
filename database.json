@@ -1,0 +1,226 @@
+{
+    "roles": [
+      {
+        "id": "integer",
+        "name": "string",
+        "users": [
+          {
+            "id": "integer",
+            "name": "string",
+            "email": "string",
+            "role_id": "integer",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+          },
+          {
+              "relatiion": [
+                  {
+                      "roles": "HasOne"
+                  }
+              ]
+          }
+        ]
+      },
+      {
+          "relatiion": [
+              {
+                  "users": "HasMany"
+              }
+          ]
+      }
+    ],
+    "categories": [
+        {
+            "id": "integer",
+            "name": "string",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "products": [
+                {
+                    "id": "integer",
+                    "name": "string",
+                    "category_id": "foreignId",
+                    "thumbnail": "string",
+                    "price": "integer",
+                    "created_at": "timestamp",
+                    "updated_at": "timestamp",
+                    "relation": [
+                        {
+                            "categories": "belongsTo"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "relation": [
+                {
+                    "products": "hasMany"
+                }
+            ]
+        }
+    ],
+    "users": [
+        {
+            "id": "integer",
+            "name": "string",
+            "email": "string",
+            "role_id": "foreignId",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "details": [
+                {
+                    "id": "integer",
+                    "user_id": "foreignId",
+                    "address": "string",
+                    "phone": "string"
+                },
+                {
+                    "relation": [
+                        {
+                            "users": "belongsTo"
+                        }
+                    ]
+                }
+            ],
+            "transactions": [
+                {
+                    "id": "integer",
+                    "user_id": "foreignId",
+                    "amount": "integer",
+                    "status": "string",
+                    "created_at": "timestamp",
+                    "updated_at": "timestamp"
+                },
+                {
+                    "relation": [
+                        {
+                            "users": "belongsTo"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "relation": [
+                {
+                    "details": "hasOne",
+                    "roles": "belongsTo",
+                    "transactions": "hasMany",
+                    "cart": "hasMany",
+                    "payments": "hasMany"
+                }
+            ]
+        }
+    ],
+
+    "products": [
+        {
+            "id": "integer",
+            "name": "string",
+            "thumbnail": "string",
+            "price": "integer",
+            "category_id": "foreignId",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "product_images": [
+                {
+                    "id": "integer",
+                    "product_id": "foreignId",
+                    "image": "string",
+                    "created_at": "timestamp",
+                    "updated_at": "timestamp"
+                },
+                {
+                    "relation": [
+                        {
+                            "products": "belongsTo"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "relation": [
+                {
+                    "categories": "belongsTo",
+                    "product_images": "hasMany",
+                    "transaction_details": "hasMany",
+                    "cart": "hasMany"
+                }
+            ]
+        }
+    ],
+    "transactions": [
+        {
+            "id": "integer",
+            "user_id": "foreignId",
+            "amount": "integer",
+            "status": "string",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "transaction_details": [
+                {
+                    "id": "integer",
+                    "transaction_id": "foreignId",
+                    "product_id": "foreignId",
+                    "quantity": "integer",
+                    "created_at": "timestamp",
+                    "updated_at": "timestamp"
+                },
+                {
+                    "relation": [
+                        {
+                            "transactions": "belongsTo",
+                            "products": "belongsTo"
+                        }
+                    ]
+                }
+            ],
+            "relation": [
+                {
+                    "payments": "hasOne",
+                    "users": "belongsTo",
+                    "transaction_details": "hasMany"
+                }
+            ]
+        }
+    ],
+    "cart": [
+        {
+            "id": "integer",
+            "user_id": "foreignId",
+            "product_id": "foreignId",
+            "quantity": "integer",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        },
+        {
+            "relation": [
+                {
+                    "users": "belongsTo",
+                    "products": "belongsTo"
+                }
+            ]
+        }
+    ],
+    "payments": [
+        {
+            "id": "integer",
+            "transaction_id": "foreignId",
+            "amount": "integer",
+            "status": "string",
+            "user_id": "foreignId",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        },
+        {
+            "relation": [
+                {
+                    "transactions": "belongsTo",
+                    "users": "belongsTo"
+                }
+            ]
+        }
+    ]
+  }

@@ -1,0 +1,17 @@
+{
+    "name": "Balian",
+    "short_name": "Balian",
+    "start_url": "/index.php",
+    "background_color": "#ffffff",
+    "description": "Aplikasi Pemesanan Sayur Online",
+    "display": "fullscreen",
+    "theme_color": "#ffffff",
+    "icons": [
+        {
+            "purpose": "maskable",
+            "sizes": "512x512",
+            "src": "logo-green-mark.png",
+            "type": "image/png"
+        }
+    ]
+}

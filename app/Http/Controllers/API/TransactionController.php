@@ -87,12 +87,12 @@ class TransactionController extends Controller
                 'app_fee' => 'required|numeric|min:0',
             ]);
 
-            
+
             $checkedCarts = Cart::whereIn('id', $validatedData['checked_items'])
             ->where('user_id', Auth::user()->id)
             ->get();
-            
-            
+
+
             if(Auth::user()->userAddress->where('status', 'active')->first() == null){
                 return response()->json([
                     'code' => 400,
@@ -100,14 +100,14 @@ class TransactionController extends Controller
                     'message' => 'User tidak memiliki alamat'
                 ], 400);
             }
-            
+
             $total = 0;
             foreach ($checkedCarts as $cart) {
                 $quantity = $validatedData['quantities'][$cart->id];
                 $price = $cart->variant->price;
                 $total += $quantity * $price;
             }
-            
+
             if($total <= 5000){
                 return response()->json([
                     'code' => 400,
@@ -130,7 +130,7 @@ class TransactionController extends Controller
                 $productVariant = $cart->variant;
                 $quantityToUpdate = $validatedData['quantities'][$cart->id];
                 $availableStockDetails = $productVariant->getAvailableStockDetails();
-                
+
                 if ($availableStockDetails->count() < $quantityToUpdate) {
                     throw new \Exception("Stok tidak cukup untuk produk {$productVariant->product->name} - {$productVariant->name}");
                 }
@@ -150,7 +150,7 @@ class TransactionController extends Controller
                 'app_fee' => $validatedData['app_fee'],
                 'address' => $transactionAddress->subDistrict->name . ' | ' . $transactionAddress->address. ' | ' . $receiver . ' | ' . $phone . ' | ' . $longitude . ' | ' . $latitude
             ]);
-    
+
             foreach($checkedCarts as $cart) {
                 $transactionDetail = TransactionDetail::create([
                     'transaction_id' => $transaction->id,
@@ -159,19 +159,19 @@ class TransactionController extends Controller
                     'price' => $cart->variant->price,
                     'capital_price' => $cart->variant->getCapitalPriceForQuantity($validatedData['quantities'][$cart->id]),
                 ]);
-                
+
                 $productVariant = $cart->variant;
                 $quantityToUpdate = $validatedData['quantities'][$cart->id];
                 $availableStockDetails = $productVariant->getAvailableStockDetails();
                 $updateIds = $availableStockDetails->take($quantityToUpdate)->pluck('id')->toArray();
-                    
+
                 $updatedCount = StockDetail::whereIn('id', $updateIds)
                     ->where('status', 'ready')
                     ->update([
                         'status' => 'sold',
                         'price' => $transactionDetail->price,
                     ]);
-                
+
                 if ($updatedCount != $quantityToUpdate) {
                     throw new \Exception("Terjadi perubahan stok untuk produk {$productVariant->product->name} - {$productVariant->name}");
                 }
@@ -339,10 +339,10 @@ class TransactionController extends Controller
     {
         $latestTransaction = Transaction::latest()->first();
         $transactionId = $latestTransaction ? $latestTransaction->id + 1 : 1;
-        
+
         $now = Carbon::now();
         $userId = Auth::id();
-        
+
         $code = sprintf(
             "TRX - %d%d%02d%02d%02d",
             $userId,
@@ -351,7 +351,7 @@ class TransactionController extends Controller
             $now->month,
             $now->year % 100
         );
-        
+
         return $code;
     }
 }

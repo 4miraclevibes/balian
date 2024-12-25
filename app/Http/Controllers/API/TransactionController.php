@@ -149,7 +149,7 @@ class TransactionController extends Controller
                 'status' => 'pending',
                 'shipping_price' => $validatedData['shipping_price'],
                 'app_fee' => $validatedData['app_fee'],
-                'notes' => $validatedData['notes'],
+                'notes' => $validatedData['notes'] ?? null,
                 'address' => $transactionAddress->subDistrict->name . ' | ' . $transactionAddress->address. ' | ' . $receiver . ' | ' . $phone . ' | ' . $longitude . ' | ' . $latitude
             ]);
 

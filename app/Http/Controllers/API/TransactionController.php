@@ -85,6 +85,7 @@ class TransactionController extends Controller
                 'quantities.*' => 'integer|min:1',
                 'shipping_price' => 'required|numeric|min:0',
                 'app_fee' => 'required|numeric|min:0',
+                'notes' => 'nullable|string'
             ]);
 
 
@@ -148,6 +149,7 @@ class TransactionController extends Controller
                 'status' => 'pending',
                 'shipping_price' => $validatedData['shipping_price'],
                 'app_fee' => $validatedData['app_fee'],
+                'notes' => $validatedData['notes'],
                 'address' => $transactionAddress->subDistrict->name . ' | ' . $transactionAddress->address. ' | ' . $receiver . ' | ' . $phone . ' | ' . $longitude . ' | ' . $latitude
             ]);
 

@@ -10,6 +10,7 @@ class Transaction extends Model
     use HasFactory;
     protected $fillable = [
         'user_id',
+        'shipping_method_id',
         'total_price',
         'status',
         'shipping_price',
@@ -19,6 +20,11 @@ class Transaction extends Model
         'notes',
         'additional_cost',
     ];
+
+    public function shippingMethod()
+    {
+        return $this->belongsTo(ShippingMethod::class);
+    }
 
     public function user()
     {

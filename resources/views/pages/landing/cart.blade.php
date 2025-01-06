@@ -58,6 +58,23 @@
     textarea#orderNotes:focus {
         box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.25);
     }
+
+    .shipping-method-btn {
+    min-width: 150px;
+    }
+
+    .shipping-method-btn .btn {
+        width: 100%;
+        height: 100%;
+        text-align: left;
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    .btn-check:checked + .btn-outline-success {
+        background-color: #4caf50;
+        color: white;
+    }
 </style>
 @endsection
 
@@ -143,7 +160,7 @@
                     • Apabila ada permintaan khusus yang memerlukan biaya tambahan, akan diinformasikan oleh admin dan tidak termasuk dalam total pembayaran saat ini
                 </small>
             </div>
-
+{{-- 
             <div class="border rounded p-3 mt-2 bg-light">
                 <i class="bi bi-info-circle text-primary"></i>
                 <small>
@@ -151,6 +168,31 @@
                     • Pesan 00:00 - 12:00 → Diantar besok pagi (5:30 - 10:00)<br>
                     • Pesan 12:00 - 24:00 → Diantar besok siang (15:30 - 18:00)
                 </small>
+            </div> --}}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" style="color: #4caf50;">Metode Pengiriman</label>
+            <div class="row g-2">
+                @foreach($shippingMethods as $method)
+                    <div class="col-6">
+                        <div class="shipping-method-btn">
+                            <input type="radio" 
+                                   class="btn-check" 
+                                   name="shipping_method" 
+                                   id="shipping_{{ $method->id }}" 
+                                   value="{{ $method->id }}"
+                                   {{ $loop->first ? 'checked' : '' }}>
+                            <label class="btn btn-outline-success" for="shipping_{{ $method->id }}">
+                                <div class="d-flex flex-column">
+                                    <strong>{{ $method->name }}</strong>
+                                    <small>Rp {{ number_format($method->cost, 0, ',', '.') }}</small>
+                                    <small class="text-muted">{{ $method->description }}</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </div>
 
@@ -161,7 +203,11 @@
                 <span id="subtotal">Rp0</span>
             </div>
             <div class="d-flex justify-content-between mb-2">
-                <span>Ongkos Kirim</span>
+                <span>Biaya Ongkos Kirim</span>
+                <span>Rp0</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span>Biaya Layanan</span>
                 <span id="totalShipping">Rp0</span>
             </div>
             <input type="hidden" id="appFee" value="0">
@@ -205,6 +251,27 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Shipping Cost:', shippingCost);
     console.log('App Fee:', appFee);
 
+    let shippingMethods = {!! json_encode($shippingMethods) !!};
+    
+    // Fungsi untuk memperbarui biaya pengiriman
+    function updateShippingCost() {
+        let selectedMethod = document.querySelector('input[name="shipping_method"]:checked');
+        if (selectedMethod) {
+            let method = shippingMethods.find(m => m.id == selectedMethod.value);
+            appFee = method.cost;
+            document.getElementById('totalShipping').textContent = `Rp${shippingCost.toLocaleString('id-ID')}`;
+            updateTotal();
+        }
+    }
+
+    // Event listener untuk perubahan metode pengiriman
+    document.querySelectorAll('input[name="shipping_method"]').forEach(radio => {
+        radio.addEventListener('change', updateShippingCost);
+    });
+
+    // Inisialisasi biaya pengiriman
+    updateShippingCost();
+
     // Fungsi untuk memperbarui kuantitas
     function updateQuantity(index, change) {
         if (items[index] && items[index].quantity !== undefined) {
@@ -242,7 +309,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('totalShipping').textContent = `Rp${totalShipping.toLocaleString('id-ID')}`;
         document.getElementById('total').textContent = `Rp${total.toLocaleString('id-ID')}`;
         document.getElementById('hiddenTotal').value = total;
-        document.getElementById('hiddenShippingPrice').value = totalShipping;
+        document.getElementById('hiddenShippingPrice').value = shippingCost;
         document.getElementById('hiddenAppFee').value = appFee;
 
         orderButton.disabled = !anyItemChecked;

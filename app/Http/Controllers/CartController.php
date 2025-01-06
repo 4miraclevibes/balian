@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Asset;
 use App\Models\Cart;
 use App\Models\ProductVariant;
-use App\Models\SubDistrict;
+use App\Models\ShippingMethod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,6 +14,7 @@ class CartController extends Controller
     public function index()
     {
         $carts = Cart::with('variant.product')->where('user_id', Auth::user()->id)->get();
+        $shippingMethods = ShippingMethod::all();
         $assets = Asset::where('is_active', true)->get();
         if($carts->isEmpty() || Auth::user()->userAddress->where('status', 'active')->first() == null){
             $shipping_price = 0;
@@ -28,7 +29,7 @@ class CartController extends Controller
         if (Auth::user()->role->name == 'driver') {
             return view('pages.landing.home', compact('assets'));
         }
-        return view('pages.landing.cart', compact('carts', 'shipping_price', 'app_fee', 'assets'));
+        return view('pages.landing.cart', compact('carts', 'shippingMethods', 'shipping_price', 'app_fee', 'assets'));
     }
 
     public function store(Request $request)

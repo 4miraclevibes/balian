@@ -78,8 +78,17 @@ class TransactionController extends Controller
             'shipping_price' => 'required|numeric|min:0',
             'app_fee' => 'required|numeric|min:0',
             'notes' => 'nullable|string',
+            'shipping_method' => 'required|exists:shipping_methods,id',
         ]);
-
+        if ($request->shipping_method == 2 || $request->shipping_method == 3) { // asumsikan selain id 1 adalah instant delivery
+            $now = Carbon::now('Asia/Jakarta');
+            $startTime = Carbon::createFromTime(5, 0, 0, 'Asia/Jakarta');
+            $endTime = Carbon::createFromTime(23, 30, 0, 'Asia/Jakarta');
+            
+            if (!$now->between($startTime, $endTime)) {
+                return back()->with('error', 'Pengiriman instant dan express hanya tersedia dari jam 05:00 sampai 23:30');
+            }
+        }
         $checkedCarts = Cart::whereIn('id', $request->checked_items)
                             ->where('user_id', Auth::user()->id)
                             ->with('variant.product')
@@ -96,7 +105,7 @@ class TransactionController extends Controller
             return back()->with('error', 'Minimal pembelian Rp. 5.000');
         }
 
-        $totalWithFees = $total + $request->shipping_price;
+        $totalWithFees = $total + $request->shipping_price + $request->app_fee;
         if($totalWithFees !== (int)$request->total_price){
             return back()->with('error', 'Ada update harga');
         }
@@ -116,6 +125,7 @@ class TransactionController extends Controller
             $transactionAddress = Auth::user()->userAddress->where('status', 'active')->first();
             $transaction = Transaction::create([
                 'total_price' => $totalWithFees,
+                'shipping_method_id' => $request->shipping_method,
                 'code' => $this->generateTransactionCode(),
                 'user_id' => Auth::user()->id,
                 'status' => 'pending',
@@ -304,7 +314,10 @@ class TransactionController extends Controller
         $message = "🛍️ *PESANAN BARU!*\n\n"
             . "*{$selectedIntro} {$selectedPetugas}!*\n\n"
             . "Kode Transaksi: *{$transaction->code}*\n"
+            . "Metode pengiriman: *{$transaction->shippingMethod->name}*\n"
             . "Pembeli: *{$transaction->user->name}*\n"
+            . "Biaya Layanan: *Rp " . number_format($transaction->app_fee, 0, ',', '.') . "*\n\n"
+            . "Biaya Ongkir: *Rp " . number_format($transaction->shipping_price, 0, ',', '.') . "*\n\n"
             . "Total Pembayaran: *Rp " . number_format($transaction->total_price, 0, ',', '.') . "*\n\n"
             . "*Detail Pesanan:*\n";
 

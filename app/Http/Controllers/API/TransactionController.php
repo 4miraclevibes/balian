@@ -181,6 +181,7 @@ class TransactionController extends Controller
 
             $checkedCarts->each->delete();
             DB::commit();
+            $this->sendWhatsappNotification($transaction);
 
             return response()->json([
                 'code' => 201,
@@ -355,5 +356,70 @@ class TransactionController extends Controller
         );
 
         return $code;
+    }
+
+    private function sendWhatsappNotification($transaction)
+    {
+        // Daftar petugas
+        $petugas = [
+            "NANDA",
+            "RIAN",
+            "MUSTAFA",
+            "DIKONT"
+        ];
+
+        // Kata-kata intro
+        $intro = [
+            "Mohon bantuannya",
+            "Tolong diproses ya",
+            "Mohon ditindaklanjuti",
+            "Tolong dicek ya",
+            "Mohon dihandle"
+        ];
+
+        // Pilih secara random
+        $selectedPetugas = $petugas[array_rand($petugas)];
+        $selectedIntro = $intro[array_rand($intro)];
+
+        // Format pesan WhatsApp
+        $message = "🛍️ *PESANAN BARU!*\n\n"
+            . "*{$selectedIntro} {$selectedPetugas}!*\n\n"
+            . "Kode Transaksi: *{$transaction->code}*\n"
+            . "Pembeli: *{$transaction->user->name}*\n"
+            . "Total Pembayaran: *Rp " . number_format($transaction->total_price, 0, ',', '.') . "*\n\n"
+            . "*Detail Pesanan:*\n";
+
+        // Tambahkan detail produk
+        foreach ($transaction->details as $detail) {
+            $message .= "- {$detail->variant->product->name} ({$detail->variant->name})\n"
+                . "  Jumlah: {$detail->quantity} x Rp " . number_format($detail->price, 0, ',', '.') . "\n";
+        }
+
+        $message .= "\n*Alamat Pengiriman:*\n{$transaction->address}\n\n"
+            . "Catatan: " . ($transaction->notes ?? '-');
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.fonnte.com/send',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => array(
+                'target' => '6285171742037, 6282286260693, 6285157950330, 6282287444224, 6281337703252',
+                'message' => $message
+            ),
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: gsRuqgbVqLAd6zpnWG9U'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        curl_close($curl);
+        return $response;
     }
 }

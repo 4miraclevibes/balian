@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\ProductVariant;
+use App\Models\ShippingMethod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -14,6 +15,7 @@ class CartController extends Controller
 {
     public function index()
     {
+        $shipping_methods = ShippingMethod::all();
         try {
             $carts = Cart::with('variant.product')->where('user_id', Auth::user()->id)->get();
             if($carts->isEmpty() || Auth::user()->userAddress->where('status', 'active')->first() == null){
@@ -30,6 +32,7 @@ class CartController extends Controller
                 'message' => 'Cart data retrieved successfully',
                 'data' => [
                     'carts' => $carts,
+                    'shipping_methods' => $shipping_methods,
                     'shipping_price' => $shipping_price,
                     'app_fee' => $app_fee
                 ]

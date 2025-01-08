@@ -84,6 +84,7 @@ class TransactionController extends Controller
                 'quantities' => 'required|array',
                 'quantities.*' => 'integer|min:1',
                 'shipping_price' => 'required|numeric|min:0',
+                'shipping_method' => 'required|exists:shipping_methods,id',
                 'app_fee' => 'required|numeric|min:0',
                 'notes' => 'nullable|string'
             ]);
@@ -144,6 +145,7 @@ class TransactionController extends Controller
 
             $transaction = Transaction::create([
                 'total_price' => $validatedData['total_price'],
+                'shipping_method_id' => $validatedData['shipping_method'],
                 'code' => $this->generateTransactionCode(),
                 'user_id' => Auth::user()->id,
                 'status' => 'pending',
@@ -385,7 +387,10 @@ class TransactionController extends Controller
         $message = "🛍️ *PESANAN BARU!*\n\n"
             . "*{$selectedIntro} {$selectedPetugas}!*\n\n"
             . "Kode Transaksi: *{$transaction->code}*\n"
+            . "Metode pengiriman: *{$transaction->shippingMethod->name}*\n"
             . "Pembeli: *{$transaction->user->name}*\n"
+            . "Biaya Layanan: *Rp " . number_format($transaction->app_fee, 0, ',', '.') . "*\n\n"
+            . "Biaya Ongkir: *Rp " . number_format($transaction->shipping_price, 0, ',', '.') . "*\n\n"
             . "Total Pembayaran: *Rp " . number_format($transaction->total_price, 0, ',', '.') . "*\n\n"
             . "*Detail Pesanan:*\n";
 

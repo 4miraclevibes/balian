@@ -78,7 +78,7 @@ class TransactionController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'total_price' => 'required|numeric|min:0',
+                // 'total_price' => 'required|numeric|min:0',
                 'checked_items' => 'required|array',
                 'checked_items.*' => 'exists:carts,id',
                 'quantities' => 'required|array',
@@ -118,7 +118,9 @@ class TransactionController extends Controller
                 ], 400);
             }
 
-            if($total !== $validatedData['total_price'] + $validatedData['app_fee'] + $validatedData['shipping_price']){
+            $totalWithFees = $total + $validatedData['shipping_price'] + $validatedData['app_fee'];
+
+            if((int)$validatedData['total_price'] !== (int)$totalWithFees){
                 return response()->json([
                     'code' => 400,
                     'status' => 'error',

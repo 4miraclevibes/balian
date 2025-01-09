@@ -118,7 +118,7 @@ class TransactionController extends Controller
                 ], 400);
             }
 
-            if($total !== $validatedData['total_price']){
+            if($total !== $validatedData['total_price'] + $validatedData['app_fee'] + $validatedData['shipping_price']){
                 return response()->json([
                     'code' => 400,
                     'status' => 'error',

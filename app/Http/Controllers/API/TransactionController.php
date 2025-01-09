@@ -78,7 +78,7 @@ class TransactionController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                // 'total_price' => 'required|numeric|min:0',
+                'total_price' => 'required|numeric|min:0',
                 'checked_items' => 'required|array',
                 'checked_items.*' => 'exists:carts,id',
                 'quantities' => 'required|array',

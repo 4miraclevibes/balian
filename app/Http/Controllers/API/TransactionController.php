@@ -188,11 +188,11 @@ class TransactionController extends Controller
             $this->sendWhatsappNotification($transaction);
 
             return response()->json([
-                'code' => 201,
+                'code' => 200,
                 'status' => 'success',
                 'message' => 'Transaction created successfully',
                 'data' => $transaction
-            ], 201);
+            ], 200);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'code' => 422,

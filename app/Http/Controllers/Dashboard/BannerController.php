@@ -28,18 +28,28 @@ class BannerController extends Controller
         ]);
 
         $is_active = $request->is_active ? true : false;
+        $results = [];
 
         foreach ($request->file('files') as $file) {
             $fileUrl = $this->serviceController->uploadImage($file);
 
-            Banner::create([
+            $banner = Banner::create([
                 ...$request->except('files'),
                 'image' => $fileUrl,
                 'is_active' => $is_active
             ]);
+
+            $results[] = [
+                'type' => 'image',
+                'record' => $banner,
+                'url' => $fileUrl
+            ];
         }
 
-        return redirect()->route('dashboard.banner.index');
+        return response()->json([
+            'message' => 'Files uploaded successfully',
+            'data' => $results,
+        ], 201);
     }
 
     public function update(Request $request, Banner $banner)

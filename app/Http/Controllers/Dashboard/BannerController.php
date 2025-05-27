@@ -23,22 +23,22 @@ class BannerController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
+            'image' => 'required|array|min:1',
+            'image.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
         ]);
 
-        $imageUrl = $this->serviceController->uploadImage($request->file('image'));
+        $is_active = $request->is_active ? true : false;
 
-        if($request->is_active) {
-            $is_active = true;
-        } else {
-            $is_active = false;
+        foreach ($request->file('image') as $image) {
+            $imageUrl = $this->serviceController->uploadImage($image);
+
+            Banner::create([
+                ...$request->except('image'),
+                'image' => $imageUrl,
+                'is_active' => $is_active
+            ]);
         }
-        
-        Banner::create([
-            ...$request->except('image'),
-            'image' => $imageUrl,
-            'is_active' => $is_active
-        ]);
+
         return redirect()->route('dashboard.banner.index');
     }
 

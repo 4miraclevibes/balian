@@ -64,7 +64,7 @@
         <div class="modal-body">
           <div class="mb-3">
             <label for="image" class="form-label">Gambar Banner</label>
-            <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
+            <input type="file" class="form-control" id="image" name="image[]" accept="image/*" required>
           </div>
           <div class="mb-3">
             <div class="form-check form-switch">
@@ -99,7 +99,7 @@
         <div class="modal-body">
           <div class="mb-3">
             <label for="image" class="form-label">Gambar Banner</label>
-            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+            <input type="file" class="form-control" id="image" name="image[]" accept="image/*">
             <small class="text-muted">Biarkan kosong jika tidak ingin mengubah gambar</small>
             <div class="mt-2">
               <img src="{{ $banner->image }}" alt="Current Banner" style="max-width: 200px;">

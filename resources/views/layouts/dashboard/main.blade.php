@@ -16,7 +16,7 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>Sayur On Delivery</title>
+    <title>Balian</title>
     <link rel="icon" href="{{ asset('assets/landing/images/logo-balian.png') }}" type="image/x-icon">
 
     <meta name="description" content="" />

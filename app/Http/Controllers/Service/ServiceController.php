@@ -19,7 +19,9 @@ class ServiceController extends Controller
             ]
         ]);
 
-        $result = json_decode($response->getBody()->getContents());
-        return $result->data->url;
+        $result = json_decode($response->getBody()->getContents(), true);
+
+        // Jika $result['data'] adalah array, iterasi atau akses elemen yang tepat
+        return $result['data'][0]['url'] ?? null; // Sesuaikan indeks sesuai kebutuhan
     }
 }

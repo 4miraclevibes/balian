@@ -11,7 +11,11 @@ class ServiceController extends Controller
         $client = new \GuzzleHttp\Client();
         $response = $client->post('https://uws.fsnthrds.com/api/service/store', [
             'multipart' => [
-                ['name' => 'files', 'contents' => fopen($image->getPathname(), 'r'), 'filename' => $image->getClientOriginalName()]
+                [
+                    'name' => 'files[]',
+                    'contents' => fopen($image->getPathname(), 'r'),
+                    'filename' => $image->getClientOriginalName()
+                ]
             ]
         ]);
 
